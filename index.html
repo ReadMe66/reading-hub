@@ -1,0 +1,19 @@
+<!doctype html><html><head><meta charset=utf-8><meta name=viewport content='width=device-width,initial-scale=1'><title>Reading Hub</title><link rel=manifest href=manifest.json><style>
+:root{--bg:#f5f5f5;--card:#fff;--tx:#111;--bd:#d8d8d8}
+@media(prefers-color-scheme:dark){:root{--bg:#121212;--card:#1d1d1d;--tx:#eee;--bd:#444}}
+body{font-family:system-ui;background:var(--bg);color:var(--tx);margin:0;padding:14px}
+h2{text-align:center;margin:0 0 10px}#status{text-align:center;font-size:13px;opacity:.8;margin-bottom:10px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.big{grid-column:1/-1;font-size:20px;padding:22px}.mid{font-size:18px;padding:18px}
+button{border:1px solid var(--bd);background:var(--card);color:var(--tx);border-radius:14px}
+#modal{display:none;position:fixed;inset:0;background:#0006;align-items:center;justify-content:center}
+#box{background:var(--card);padding:16px;border-radius:16px;width:92%;max-width:420px}
+input{width:100%;padding:10px;margin:8px 0;border:1px solid var(--bd);border-radius:10px;background:var(--bg);color:var(--tx);box-sizing:border-box}
+</style></head><body><h2>📚 Reading Hub</h2><div id=status>Copy text in your ebook, then tap a button.</div><div id=g class=grid></div><div id=modal><div id=box><h3>Edit Button</h3><input id=n><input id=u><div style='display:flex;gap:8px'><button onclick='closeM()'>Cancel</button><button onclick='save()'>Save</button></div><p style='font-size:13px'>Use %s where copied text should appear.</p></div></div><script>
+const defs=[['Cambridge','https://dictionary.cambridge.org/dictionary/english/%s'],['Wiktionary','https://en.wiktionary.org/wiki/%s'],['Expression','https://www.google.com/search?q=expression+%22%s%22'],['Slang','https://www.google.com/search?q=slang+%22%s%22'],['Ludwig','https://ludwig.guru/s/%s'],['Wikipedia','https://en.wikipedia.org/wiki/Special:Search?search=%s'],['DeepL','https://www.deepl.com/translator#en/en/%s']];
+let btns=JSON.parse(localStorage.rh||'null')||defs.map(x=>({name:x[0],url:x[1]}));let edit=-1;
+function cls(i){return i==2?'big':(i<4?'mid':'')}
+function draw(){g.innerHTML='';btns.forEach((b,i)=>{let bt=document.createElement('button');bt.className=cls(i);bt.textContent=b.name;bt.onclick=()=>run(b);let t;bt.onpointerdown=()=>t=setTimeout(()=>ed(i),700);['pointerup','pointerleave','pointercancel'].forEach(e=>bt.addEventListener(e,()=>clearTimeout(t)));g.appendChild(bt);});}
+async function run(b){let txt='';try{txt=(await navigator.clipboard.readText()).trim()}catch{};if(!txt){status.textContent='Copy text first';setTimeout(()=>status.textContent='Copy text in your ebook, then tap a button.',1500);return;}location.href=b.url.replace('%s',encodeURIComponent(txt));}
+function ed(i){edit=i;n.value=btns[i].name;u.value=btns[i].url;modal.style.display='flex'}function closeM(){modal.style.display='none'}function save(){btns[edit]={name:n.value,url:u.value};localStorage.rh=JSON.stringify(btns);closeM();draw()}
+if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js');draw();
+</script></body></html>

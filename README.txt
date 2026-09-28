@@ -1,0 +1,1 @@
+Upload these files to a GitHub repository named reading-hub, enable GitHub Pages, then install from Firefox.
